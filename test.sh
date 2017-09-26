@@ -5,6 +5,7 @@
 #   * ansible --version
 #   * ansible all --inventory='localhost,' --connection=local -m ping
 
+SSH_GROUP_ID=$(cut -d: -f3 < <(getent group ssh))
 USER_ID=$(id -u $(whoami))
 GROUP_ID=$(id -g $(whoami))
 WORK_AREA=/work-area
@@ -18,11 +19,11 @@ CMD="docker run --net host \
                 --rm \
                 --tty \
                 --user=${USER_ID}:${GROUP_ID} \
-                --volume $(pwd):${WORK_AREA} \
+                --volume $(pwd):$(pwd) \
                 --volume ${HOME_DIR}:${HOME_DIR} \
                 --volume /etc/passwd:/etc/passwd \
                 --volume /etc/group:/etc/group \
-                --workdir ${WORK_AREA} \
+                --workdir $(pwd) \
                 dockeransible2bastionaccess_deployer:latest $*"
 echo $CMD
 $CMD
