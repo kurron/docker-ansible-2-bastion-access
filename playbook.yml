@@ -1,0 +1,18 @@
+#!/usr/bin/env ansible-playbook
+---
+  - name: Deploy Containers
+    hosts: gatewayed
+    become: no
+    tasks:
+        - docker_container:
+              detach: True
+              image: hello-world:latest
+              log_driver: json-file
+              log_options:
+                  max-size: 1m
+                  max-file: 3
+              memory: 128m
+              name: hello
+              restart_policy: always
+              state: present
+              timeout: 60
