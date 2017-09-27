@@ -1,3 +1,3 @@
 #!/bin/bash
 
-ansible -m ping all -vvvv
+ansible -m ping all

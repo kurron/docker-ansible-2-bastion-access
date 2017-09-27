@@ -14,11 +14,13 @@ HOME_DIR=$(cut -d: -f6 < <(getent passwd ${USER_ID}))
 CMD="docker run --net host \
                 --hostname inside-docker \
                 --env HOME=${HOME_DIR} \
+                --env SSH_AUTH_SOCK=${SSH_AUTH_SOCK} \
                 --interactive \
                 --name deployer-test \
                 --rm \
                 --tty \
                 --user=${USER_ID}:${GROUP_ID} \
+                --volume ${SSH_AUTH_SOCK}:${SSH_AUTH_SOCK} \
                 --volume $(pwd):$(pwd) \
                 --volume ${HOME_DIR}:${HOME_DIR} \
                 --volume /etc/passwd:/etc/passwd \
