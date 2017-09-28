@@ -1,6 +1,6 @@
 [gatewayed]
-alpha ansible_host=10.0.1.12
-bravo ansible_host=10.0.3.109
+alpha ansible_host=10.0.3.35
+bravo ansible_host=10.0.1.174
 
 [public]
 bastion ansible_host=35.161.40.2

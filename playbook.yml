@@ -1,5 +1,22 @@
 #!/usr/bin/env ansible-playbook
 ---
+  - name: Install Required Pyhon Modules (Amazon)
+    hosts: gatewayed
+    become: no
+    tasks:
+        - name: Download Pip Installation Script
+          get_url:
+             url: "https://bootstrap.pypa.io/get-pip.py"
+             dest: "{{ansible_user_dir}}/get-pip.py"
+             mode: 0444
+          when: ansible_distribution == "Amazon"
+        - name: Install PIP
+          command: "python {{ansible_user_dir}}/get-pip.py --user"
+          when: ansible_distribution == "Amazon"
+        - name: Install Docker Module
+          command: "{{ansible_user_dir}}/.local/bin/pip install docker-py --upgrade --user"
+          when: ansible_distribution == "Amazon"
+
   - name: Deploy Containers
     hosts: gatewayed
     become: no
@@ -9,8 +26,8 @@
               image: hello-world:latest
               log_driver: json-file
               log_options:
-                  max-size: 1m
-                  max-file: 3
+                  max-size: "1m"
+                  max-file: "3"
               memory: 128m
               name: hello
               restart_policy: always

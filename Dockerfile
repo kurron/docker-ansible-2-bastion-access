@@ -8,7 +8,8 @@ CMD ["/usr/bin/ansible", "all", "--inventory=localhost,", "--verbose", "--connec
 # ---- watch your layers and put likely mutating operations here -----
 
 RUN apt-get update --yes && \
-    apt-get install --yes software-properties-common openssh-client curl && \
+    apt-get install --yes software-properties-common openssh-client curl python-docker && \
     apt-add-repository --yes ppa:ansible/ansible && \
     apt-get update --yes && \
-    apt-get install --yes ansible
+    apt-get install --yes ansible && \
+    apt-get purge --yes
