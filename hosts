@@ -1,4 +1,4 @@
-[gatewayed]
+[private]
 alpha ansible_host=10.0.3.35
 bravo ansible_host=10.0.1.174
 
