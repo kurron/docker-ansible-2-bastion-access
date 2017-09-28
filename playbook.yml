@@ -1,6 +1,6 @@
 #!/usr/bin/env ansible-playbook
 ---
-  - name: Install Required Pyhon Modules (Amazon)
+  - name: Install Required Python Modules (Amazon)
     hosts: private
     become: no
     tasks:
