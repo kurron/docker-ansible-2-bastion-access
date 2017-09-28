@@ -1,1 +1,1 @@
-ansible_ssh_common_args: '-vvv -o ForwardAgent=yes -o ProxyCommand="ssh -W %h:%p ec2-user@52.27.144.200"'
+ansible_ssh_common_args: '-o ForwardAgent=yes -o ProxyCommand="ssh -W %h:%p ec2-user@35.161.40.2"'
