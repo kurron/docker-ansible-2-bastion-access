@@ -10,12 +10,14 @@ USER_ID=$(id -u $(whoami))
 GROUP_ID=$(id -g $(whoami))
 WORK_AREA=/work-area
 HOME_DIR=$(cut -d: -f6 < <(getent passwd ${USER_ID}))
+BASTION=34.212.154.125
 
 ADD_KEY="ssh-add bastion"
 echo ${ADD_KEY}
 ${ADD_KEY}
 
 CMD="docker run --net host \
+                --add-host bastion:${BASTION}\
                 --hostname inside-docker \
                 --env HOME=${HOME_DIR} \
                 --env SSH_AUTH_SOCK=${SSH_AUTH_SOCK} \
