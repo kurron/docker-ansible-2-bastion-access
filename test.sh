@@ -11,6 +11,10 @@ GROUP_ID=$(id -g $(whoami))
 WORK_AREA=/work-area
 HOME_DIR=$(cut -d: -f6 < <(getent passwd ${USER_ID}))
 
+ADD_KEY="ssh-add bastion"
+echo ${ADD_KEY}
+${ADD_KEY}
+
 CMD="docker run --net host \
                 --hostname inside-docker \
                 --env HOME=${HOME_DIR} \
