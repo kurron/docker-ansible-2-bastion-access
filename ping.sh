@@ -1,8 +1,9 @@
 #!/bin/bash
 
-FOO="-F ssh-config.ini"
+INVENTORY="${1:-10.0.1.131,10.0.3.31}"
+
 CMD="ansible --user ec2-user \
-             --inventory-file hosts.ini \
+             --inventory ${INVENTORY} \
              --verbose \
              -m ping all"
 
