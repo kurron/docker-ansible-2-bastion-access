@@ -9,6 +9,7 @@
 PROJECT=${1:-Weapon-X}
 ENVIRONMENT=${2:-development}
 REGION=${3:-us-west-2}
+PRIVATE_SSH_KEY=${4:-bastion}
 
 function determineBastionAddress() {
   local STATE_FILTER=Name=instance-state-name,Values=running
@@ -55,7 +56,7 @@ function determineDockerAddresses() {
 }
 
 function addKeyToAgent() {
-  local ADD_KEY="ssh-add bastion"
+  local ADD_KEY="ssh-add ${PRIVATE_SSH_KEY}"
   echo ${ADD_KEY}
   ${ADD_KEY}
 }
