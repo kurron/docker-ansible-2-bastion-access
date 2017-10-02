@@ -67,6 +67,13 @@ function runContainer() {
   local WORK_AREA=/work-area
   local HOME_DIR=$(cut -d: -f6 < <(getent passwd ${USER_ID}))
 
+  ANSIBLE="ansible --user ec2-user \
+                   --inventory ${WORKERS} \
+                   --verbose \
+                   -m ping all"
+
+  echo ${ANSIBLE}
+
   local CMD="docker run --net host \
                   --add-host bastion:${BASTION} \
                   --hostname inside-docker \
@@ -83,7 +90,7 @@ function runContainer() {
                   --volume /etc/passwd:/etc/passwd \
                   --volume /etc/group:/etc/group \
                   --workdir $(pwd) \
-                  dockeransible2bastionaccess_deployer:latest $*"
+                  dockeransible2bastionaccess_deployer:latest ${ANSIBLE}"
   echo $CMD
   $CMD
 }
