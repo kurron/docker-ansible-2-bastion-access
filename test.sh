@@ -14,7 +14,7 @@ function determineBastionAddress() {
   local STATE_FILTER=Name=instance-state-name,Values=running
   local PROJECT_FILTER=Name=tag:Project,Values=$2
   local ENVIRONMENT_FILTER=Name=tag:Environment,Values=$3
-  local NAME_FILTER=Name=tag:Name,Values=$4
+  local DUTY_FILTER=Name=tag:Duty,Values=$4
 
   local CMD="aws --profile qa \
                  --region $1 \
@@ -22,7 +22,7 @@ function determineBastionAddress() {
                  --filters ${STATE_FILTER} \
                  --filters ${PROJECT_FILTER} \
                  --filters ${ENVIRONMENT_FILTER} \
-                 --filters ${NAME_FILTER} \
+                 --filters ${DUTY_FILTER} \
                  --query Reservations[*].Instances[*].[PublicIpAddress] \
                  --output text"
   echo ${CMD}
@@ -35,7 +35,7 @@ function determineDockerAddresses() {
   local STATE_FILTER=Name=instance-state-name,Values=running
   local PROJECT_FILTER=Name=tag:Project,Values=$2
   local ENVIRONMENT_FILTER=Name=tag:Environment,Values=$3
-  local NAME_FILTER=Name=tag:Name,Values=$4
+  local DUTY_FILTER=Name=tag:Duty,Values=$4
 
   local CMD="aws --profile qa \
                  --region $1 \
@@ -43,7 +43,7 @@ function determineDockerAddresses() {
                  --filters ${STATE_FILTER} \
                  --filters ${PROJECT_FILTER} \
                  --filters ${ENVIRONMENT_FILTER} \
-                 --filters ${NAME_FILTER} \
+                 --filters ${DUTY_FILTER} \
                  --query Reservations[*].Instances[*].[PrivateIpAddress] \
                  --output text"
 
@@ -67,9 +67,10 @@ function runContainer() {
   local WORK_AREA=/work-area
   local HOME_DIR=$(cut -d: -f6 < <(getent passwd ${USER_ID}))
 
-  ANSIBLE="./playbook.yml --user ec2-user \
-                        --inventory ${WORKERS} \
-                        --verbose"
+  ANSIBLE="ansible-playbook --user ec2-user \
+                            --inventory ${WORKERS} \
+                            --verbose \
+                            playbook.yml"
 
   echo ${ANSIBLE}
 
@@ -94,7 +95,7 @@ function runContainer() {
   $CMD
 }
 
-determineBastionAddress ${REGION} Weapon-X ${ENVIRONMENT} Bastion
-determineDockerAddresses ${REGION} Weapon-X ${ENVIRONMENT} Worker
+determineBastionAddress ${REGION} ${PROJECT} ${ENVIRONMENT} Bastion
+determineDockerAddresses ${REGION} ${PROJECT} ${ENVIRONMENT} Docker
 addKeyToAgent
 runContainer
