@@ -67,10 +67,9 @@ function runContainer() {
   local WORK_AREA=/work-area
   local HOME_DIR=$(cut -d: -f6 < <(getent passwd ${USER_ID}))
 
-  ANSIBLE="ansible --user ec2-user \
-                   --inventory ${WORKERS} \
-                   --verbose \
-                   -m ping all"
+  ANSIBLE="./playbook.yml --user ec2-user \
+                        --inventory ${WORKERS} \
+                        --verbose"
 
   echo ${ANSIBLE}
 

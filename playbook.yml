@@ -1,7 +1,7 @@
 #!/usr/bin/env ansible-playbook
 ---
   - name: Install Required Python Modules (Amazon)
-    hosts: private
+    hosts: all
     become: no
     tasks:
         - name: Download Pip Installation Script
@@ -18,7 +18,7 @@
           when: ansible_distribution == "Amazon"
 
   - name: Deploy Containers
-    hosts: private
+    hosts: all
     become: no
     tasks:
         - docker_container:
