@@ -1,6 +1,6 @@
 #!/bin/bash
 
-INVENTORY="${1:-10.0.1.131,10.0.3.31}"
+INVENTORY="${1:-10.0.1.234,10.0.3.181}"
 
 CMD="ansible --user ec2-user \
              --inventory ${INVENTORY} \
