@@ -16,19 +16,42 @@ function determineBastionAddress() {
   local ENVIRONMENT_FILTER=Name=tag:Environment,Values=$3
   local NAME_FILTER=Name=tag:Name,Values=$4
 
-  local EC2_CMD="aws --profile qa \
-               --region $1 \
-               ec2 describe-instances \
-               --filters ${STATE_FILTER} \
-               --filters ${PROJECT_FILTER} \
-               --filters ${ENVIRONMENT_FILTER} \
-               --filters ${NAME_FILTER} \
-               --query Reservations[*].Instances[*].[PublicIpAddress] \
-               --output text"
-  echo ${EC2_CMD}
-  BASTION=$(${EC2_CMD})
+  local CMD="aws --profile qa \
+                 --region $1 \
+                 ec2 describe-instances \
+                 --filters ${STATE_FILTER} \
+                 --filters ${PROJECT_FILTER} \
+                 --filters ${ENVIRONMENT_FILTER} \
+                 --filters ${NAME_FILTER} \
+                 --query Reservations[*].Instances[*].[PublicIpAddress] \
+                 --output text"
+  echo ${CMD}
+  BASTION=$(${CMD})
   echo "Bastion IP address is ${BASTION}"
 
+}
+
+function determineDockerAddresses() {
+  local STATE_FILTER=Name=instance-state-name,Values=running
+  local PROJECT_FILTER=Name=tag:Project,Values=$2
+  local ENVIRONMENT_FILTER=Name=tag:Environment,Values=$3
+  local NAME_FILTER=Name=tag:Name,Values=$4
+
+  local CMD="aws --profile qa \
+                 --region $1 \
+                 ec2 describe-instances \
+                 --filters ${STATE_FILTER} \
+                 --filters ${PROJECT_FILTER} \
+                 --filters ${ENVIRONMENT_FILTER} \
+                 --filters ${NAME_FILTER} \
+                 --query Reservations[*].Instances[*].[PrivateIpAddress] \
+                 --output text"
+
+  echo ${CMD}
+  local IDS=$(${CMD})
+  echo ${IDS}
+  WORKERS=$(echo ${IDS} | sed -e "s/ /,/g")
+  echo "Docker addresses are ${WORKERS}"
 }
 
 function addKeyToAgent() {
@@ -66,5 +89,6 @@ function runContainer() {
 }
 
 determineBastionAddress ${REGION} Weapon-X ${ENVIRONMENT} Bastion
+determineDockerAddresses ${REGION} Weapon-X ${ENVIRONMENT} Worker
 addKeyToAgent
 runContainer
