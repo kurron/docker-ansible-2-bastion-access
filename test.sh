@@ -24,7 +24,7 @@ function determineBastionAddress() {
                  --filters ${PROJECT_FILTER} \
                  --filters ${ENVIRONMENT_FILTER} \
                  --filters ${DUTY_FILTER} \
-                 --query Reservations[*].Instances[*].[PublicIpAddress] \
+                 --query Reservations[0].Instances[*].[PublicIpAddress] \
                  --output text"
   echo ${CMD}
   BASTION=$(${CMD})
