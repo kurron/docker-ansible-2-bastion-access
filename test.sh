@@ -80,6 +80,7 @@ function runContainer() {
                   --hostname inside-docker \
                   --env HOME=${HOME_DIR} \
                   --env SSH_AUTH_SOCK=${SSH_AUTH_SOCK} \
+                  --env ANSIBLE_CONFIG=/tmp/ansible.cfg \
                   --interactive \
                   --name deployer-test \
                   --rm \

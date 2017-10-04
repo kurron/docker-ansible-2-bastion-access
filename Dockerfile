@@ -7,6 +7,9 @@ CMD ["/usr/bin/ansible", "all", "--inventory=localhost,", "--verbose", "--connec
 
 # ---- watch your layers and put likely mutating operations here -----
 
+COPY ansible.cfg /tmp/ansible.cfg
+COPY ssh-config.ini /tmp/ssh-config.ini
+
 RUN apt-get update --yes && \
     apt-get install --yes software-properties-common openssh-client curl && \
     apt-add-repository --yes ppa:ansible/ansible && \
