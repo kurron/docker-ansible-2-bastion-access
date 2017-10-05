@@ -1,24 +1,24 @@
 #!/bin/bash
 
-# Any arguments provided to this script will be the command run inside the container.
-# This to try:
-#   * ansible --version
-#   * ansible all --inventory='localhost,' --connection=local -m ping
+# Environment variables used to locate the proper EC2 instances
+PROJECT=${PROJECT:-Weapon-X}
+ENVIRONMENT=${ENVIRONMENT:-development}
+REGION=${REGION:-us-west-2}
 
-
-PROJECT=${1:-Weapon-X}
-ENVIRONMENT=${2:-development}
-REGION=${3:-us-west-2}
-PRIVATE_SSH_KEY=${4:-bastion}
+# Environment variables used to access Hashicorp Vault, which holds the private SSH key
+VAULT_ADDR=${VAULT_ADDR:-http://192.168.254.90:8200}
+ROLE_ID=${ROLE_ID:-ab30c420-3f48-60e3-b45e-07a672aa4860}
+SECRET_ID=${SECRET_ID:-0fb79713-0c1b-edd2-6d60-b6714da074d2}
+VAULT_PATH=${VAULT_PATH:-secret/build/ssh/slurpe}
 
 function determineBastionAddress() {
   local STATE_FILTER=Name=instance-state-name,Values=running
-  local PROJECT_FILTER=Name=tag:Project,Values=$2
-  local ENVIRONMENT_FILTER=Name=tag:Environment,Values=$3
-  local DUTY_FILTER=Name=tag:Duty,Values=$4
+  local PROJECT_FILTER=Name=tag:Project,Values=${PROJECT}
+  local ENVIRONMENT_FILTER=Name=tag:Environment,Values=${ENVIRONMENT}
+  local DUTY_FILTER=Name=tag:Duty,Values=$1
 
   local CMD="aws --profile qa \
-                 --region $1 \
+                 --region ${REGION} \
                  ec2 describe-instances \
                  --filters ${STATE_FILTER} \
                  --filters ${PROJECT_FILTER} \
@@ -34,12 +34,12 @@ function determineBastionAddress() {
 
 function determineDockerAddresses() {
   local STATE_FILTER=Name=instance-state-name,Values=running
-  local PROJECT_FILTER=Name=tag:Project,Values=$2
-  local ENVIRONMENT_FILTER=Name=tag:Environment,Values=$3
-  local DUTY_FILTER=Name=tag:Duty,Values=$4
+  local PROJECT_FILTER=Name=tag:Project,Values=${PROJECT}
+  local ENVIRONMENT_FILTER=Name=tag:Environment,Values=${ENVIRONMENT}
+  local DUTY_FILTER=Name=tag:Duty,Values=$1
 
   local CMD="aws --profile qa \
-                 --region $1 \
+                 --region ${REGION} \
                  ec2 describe-instances \
                  --filters ${STATE_FILTER} \
                  --filters ${PROJECT_FILTER} \
@@ -53,12 +53,6 @@ function determineDockerAddresses() {
   echo ${IDS}
   WORKERS=$(echo ${IDS} | sed -e "s/ /,/g")
   echo "Docker addresses are ${WORKERS}"
-}
-
-function addKeyToAgent() {
-  local ADD_KEY="ssh-add ${PRIVATE_SSH_KEY}"
-  echo ${ADD_KEY}
-  ${ADD_KEY}
 }
 
 function runContainer() {
@@ -79,25 +73,27 @@ function runContainer() {
                   --add-host bastion:${BASTION} \
                   --hostname inside-docker \
                   --env HOME=${HOME_DIR} \
-                  --env SSH_AUTH_SOCK=${SSH_AUTH_SOCK} \
                   --env ANSIBLE_CONFIG=/tmp/ansible.cfg \
+                  --env VAULT_ADDR=${VAULT_ADDR} \
+                  --env ROLE_ID=${ROLE_ID} \
+                  --env SECRET_ID=${SECRET_ID} \
+                  --env VAULT_PATH=${VAULT_PATH} \
+                  --env WORKERS=${WORKERS} \
                   --interactive \
                   --name deployer-test \
                   --rm \
                   --tty \
                   --user=${USER_ID}:${GROUP_ID} \
-                  --volume ${SSH_AUTH_SOCK}:${SSH_AUTH_SOCK} \
                   --volume $(pwd):$(pwd) \
                   --volume ${HOME_DIR}:${HOME_DIR} \
                   --volume /etc/passwd:/etc/passwd \
                   --volume /etc/group:/etc/group \
                   --workdir $(pwd) \
-                  dockeransible2bastionaccess_deployer:latest ${ANSIBLE}"
+                  dockeransible2bastionaccess_deployer:latest ./deploy-docker-containers.sh"
   echo $CMD
   $CMD
 }
 
-determineBastionAddress ${REGION} ${PROJECT} ${ENVIRONMENT} Bastion
-determineDockerAddresses ${REGION} ${PROJECT} ${ENVIRONMENT} Docker
-addKeyToAgent
+determineBastionAddress Bastion
+determineDockerAddresses Docker
 runContainer

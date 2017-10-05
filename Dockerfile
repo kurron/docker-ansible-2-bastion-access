@@ -7,12 +7,16 @@ CMD ["/usr/bin/ansible", "all", "--inventory=localhost,", "--verbose", "--connec
 
 # ---- watch your layers and put likely mutating operations here -----
 
-COPY ansible.cfg /tmp/ansible.cfg
-COPY ssh-config.ini /tmp/ssh-config.ini
+COPY ansible/ansible.cfg /tmp/ansible.cfg
+COPY ansible/ssh-config.ini /tmp/ssh-config.ini
+
+ADD https://releases.hashicorp.com/vault/0.8.3/vault_0.8.3_linux_amd64.zip /tmp/vault.zip
 
 RUN apt-get update --yes && \
-    apt-get install --yes software-properties-common openssh-client curl && \
+    apt-get install --yes software-properties-common openssh-client curl unzip && \
     apt-add-repository --yes ppa:ansible/ansible && \
     apt-get update --yes && \
     apt-get install --yes ansible && \
-    apt-get purge --yes
+    apt-get purge --yes && \
+    unzip /tmp/vault.zip -d /usr/local/bin && \
+    chmod a+w /usr/local/bin/vault
