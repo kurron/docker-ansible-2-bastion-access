@@ -16,7 +16,8 @@ RUN apt-get update --yes && \
     apt-get install --yes software-properties-common openssh-client curl unzip && \
     apt-add-repository --yes ppa:ansible/ansible && \
     apt-get update --yes && \
-    apt-get install --yes ansible && \
+    apt-get install --yes ansible python-pip && \
     apt-get purge --yes && \
     unzip /tmp/vault.zip -d /usr/local/bin && \
-    chmod a+w /usr/local/bin/vault
+    chmod a+w /usr/local/bin/vault && \
+    pip install awscli
