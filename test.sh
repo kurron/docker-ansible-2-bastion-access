@@ -1,9 +1,13 @@
 #!/bin/bash
 
+# Environment variables required by the AWS CLI
+export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-west-2}
+export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-CHANGEME}
+export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-CHANGEME}
+
 # Environment variables used to locate the proper EC2 instances
 PROJECT=${PROJECT:-Weapon-X}
 ENVIRONMENT=${ENVIRONMENT:-development}
-REGION=${REGION:-us-west-2}
 
 # Environment variables used to access Hashicorp Vault, which holds the private SSH key
 VAULT_ADDR=${VAULT_ADDR:-http://192.168.254.90:8200}
@@ -17,9 +21,7 @@ function determineBastionAddress() {
   local ENVIRONMENT_FILTER=Name=tag:Environment,Values=${ENVIRONMENT}
   local DUTY_FILTER=Name=tag:Duty,Values=$1
 
-  local CMD="aws --profile qa \
-                 --region ${REGION} \
-                 ec2 describe-instances \
+  local CMD="aws ec2 describe-instances \
                  --filters ${STATE_FILTER} \
                  --filters ${PROJECT_FILTER} \
                  --filters ${ENVIRONMENT_FILTER} \
@@ -38,9 +40,7 @@ function determineDockerAddresses() {
   local ENVIRONMENT_FILTER=Name=tag:Environment,Values=${ENVIRONMENT}
   local DUTY_FILTER=Name=tag:Duty,Values=$1
 
-  local CMD="aws --profile qa \
-                 --region ${REGION} \
-                 ec2 describe-instances \
+  local CMD="aws ec2 describe-instances \
                  --filters ${STATE_FILTER} \
                  --filters ${PROJECT_FILTER} \
                  --filters ${ENVIRONMENT_FILTER} \
