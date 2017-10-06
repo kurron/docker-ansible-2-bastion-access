@@ -13,11 +13,10 @@ COPY ansible/ssh-config.ini /tmp/ssh-config.ini
 ADD https://releases.hashicorp.com/vault/0.8.3/vault_0.8.3_linux_amd64.zip /tmp/vault.zip
 
 RUN apt-get update --yes && \
-    apt-get install --yes software-properties-common openssh-client curl unzip && \
+    apt-get install --yes software-properties-common openssh-client unzip && \
     apt-add-repository --yes ppa:ansible/ansible && \
     apt-get update --yes && \
     apt-get install --yes ansible python-pip && \
     apt-get purge --yes && \
     unzip /tmp/vault.zip -d /usr/local/bin && \
-    chmod a+w /usr/local/bin/vault && \
-    pip install awscli
+    chmod a+w /usr/local/bin/vault
