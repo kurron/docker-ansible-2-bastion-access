@@ -1,11 +1,10 @@
 #!/bin/bash
 
-# Environment variables required by the AWS CLI
+# Environment variables required by the Ansible playbook
 BASTION_ADDRESS=${BASTION_ADDRESS:-52.36.175.254}
 DOCKER_ADDRESSES=${DOCKER_ADDRESSES:-10.0.1.194,10.0.3.253}
 
 # Environment variables needed to map the Docker user to the user's Environment
-SSH_GROUP_ID=${SSH_GROUP_ID:-$(cut -d: -f3 < <(getent group ssh))}
 USER_ID=${USER_ID:-$(id -u $(whoami))}
 GROUP_ID=${GROUP_ID:-$(id -g $(whoami))}
 HOME_DIR=${HOME_DIR:-$(cut -d: -f6 < <(getent passwd ${USER_ID}))}
@@ -15,6 +14,9 @@ VAULT_ADDR=${VAULT_ADDR:-http://192.168.254.90:8200}
 ROLE_ID=${ROLE_ID:-CHANGEME}
 SECRET_ID=${SECRET_ID:-CHANGEME}
 VAULT_PATH=${VAULT_PATH:-CHANGEME}
+
+# Environment variable describing the location of the playbook to run
+PLAYBOOK=${PLAYBOOK:-$(pwd)/ansible/playbook.yml}
 
 function runContainer() {
   local CMD="docker run --net host \
@@ -32,12 +34,12 @@ function runContainer() {
                   --rm \
                   --tty \
                   --user=${USER_ID}:${GROUP_ID} \
-                  --volume $(pwd):$(pwd) \
                   --volume ${HOME_DIR}:${HOME_DIR} \
+                  --volume ${PLAYBOOK}:${HOME_DIR}/playbook.yml \
                   --volume /etc/passwd:/etc/passwd \
                   --volume /etc/group:/etc/group \
-                  --workdir $(pwd) \
-                  dockeransible2bastionaccess_deployer:latest bash"
+                  --workdir ${HOME_DIR} \
+                  dockeransible2bastionaccess_deployer:latest /tmp/deploy-docker-containers.sh"
   echo $CMD
   $CMD
 }

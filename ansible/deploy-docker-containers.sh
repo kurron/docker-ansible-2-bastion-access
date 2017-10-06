@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 # Pulls the private SSH key from Ansible Vault.  All variables are expected
 # to be available in the environment.
 
