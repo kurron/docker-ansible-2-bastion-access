@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Environment variables required by the Ansible playbook
-BASTION_ADDRESS=${BASTION_ADDRESS:-52.36.175.254}
+BASTION_ADDRESS=${BASTION_ADDRESS:-34.210.29.82}
 DOCKER_ADDRESSES=${DOCKER_ADDRESSES:-10.0.1.194,10.0.3.253}
 
 # Environment variables needed to map the Docker user to the user's Environment
@@ -15,8 +15,9 @@ ROLE_ID=${ROLE_ID:-CHANGEME}
 SECRET_ID=${SECRET_ID:-CHANGEME}
 VAULT_PATH=${VAULT_PATH:-CHANGEME}
 
-# Environment variable describing the location of the playbook to run
+# Environment variables needed to launch the Ansible playbook
 PLAYBOOK=${PLAYBOOK:-$(pwd)/ansible/playbook.yml}
+EXTRA_VARS_YAML=${EXTRA_VARS_YAML:-$(pwd)/ansible/extra-vars.yml}
 
 function runContainer() {
   local CMD="docker run --net host \
@@ -36,6 +37,7 @@ function runContainer() {
                   --user=${USER_ID}:${GROUP_ID} \
                   --volume ${HOME_DIR}:${HOME_DIR} \
                   --volume ${PLAYBOOK}:${HOME_DIR}/playbook.yml \
+                  --volume ${EXTRA_VARS_YAML}:${HOME_DIR}/extra-vars.yml \
                   --volume /etc/passwd:/etc/passwd \
                   --volume /etc/group:/etc/group \
                   --workdir ${HOME_DIR} \

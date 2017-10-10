@@ -33,3 +33,7 @@
               restart_policy: always
               state: present
               timeout: 60
+              env:
+                  FOO: "{{ foo }}"
+                  BAR: "{{ bar }}"
+                  BAZ: "{{ baz }}"

@@ -26,6 +26,7 @@ ssh-add -L
 ANSIBLE="ansible-playbook --user ec2-user \
                           --inventory ${WORKERS} \
                           --verbose \
+                          --extra-vars @extra-vars.yml \
                           playbook.yml"
 echo ${ANSIBLE}
 ${ANSIBLE}
